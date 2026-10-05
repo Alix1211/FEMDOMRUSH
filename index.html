@@ -1,98 +1,105 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
-  <meta name="theme-color" content="#111318" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#151217">
   <title>FEMDOM RUSH</title>
-  <style>
-    :root{color-scheme:dark}
-    *{box-sizing:border-box}
-    html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#111318}
-    body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;touch-action:manipulation}
-    #gameRoot{
-      position:relative;width:100%;height:100dvh;min-height:100%;
-      display:grid;place-items:center;overflow:hidden;
-      background:
-        radial-gradient(circle at 50% 35%,#3a241f 0,#1b1718 42%,#0d0f13 100%);
-    }
-    #placeholder{text-align:center;color:#f5dfbd;text-shadow:0 2px 6px #000}
-    #placeholder h1{margin:0 0 8px;font-size:clamp(30px,6vw,74px);letter-spacing:.06em}
-    #placeholder p{margin:0;opacity:.72;font-size:clamp(13px,2vw,20px)}
-    #fullscreenBtn{
-      position:fixed;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));
-      z-index:9999;min-width:112px;height:44px;padding:0 14px;border:1px solid #d7aa58;border-radius:12px;
-      background:linear-gradient(#5b3028,#321a19);color:#fff1cc;font-weight:800;font-size:14px;
-      box-shadow:0 4px 16px #0008,inset 0 0 0 1px #8c5536;cursor:pointer;
-      -webkit-tap-highlight-color:transparent;
-    }
-    #fullscreenBtn:active{transform:scale(.96)}
-    :fullscreen #gameRoot,:-webkit-full-screen #gameRoot{width:100vw;height:100vh}
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main id="gameRoot">
-    <div id="placeholder">
-      <h1>FEMDOM RUSH</h1>
-      <p>전투 프로토타입 준비 중</p>
+<main id="gameRoot">
+  <canvas id="gameCanvas" width="1280" height="720"></canvas>
+
+  <div id="topLeft" class="glass">
+    <span>❤️ <b id="lives">20</b></span>
+    <span>MAP 01 · 붉은 초원 관문</span>
+  </div>
+
+  <div id="topMid" class="glass">
+    <div id="waveRow">
+      <span id="waveLabel">준비</span>
+      <div id="waveBar"><div id="waveFill"></div></div>
+      <button id="earlyBtn" type="button" disabled>조기 호출</button>
     </div>
-  </main>
+  </div>
 
-  <button id="fullscreenBtn" type="button" aria-label="전체화면 전환">⛶ 전체화면</button>
+  <div id="topRight">
+    <button id="pauseBtn" class="glass" type="button">Ⅱ</button>
+    <button id="speedBtn" class="glass" type="button">1×</button>
+    <button id="fullscreenBtn" type="button">⛶ 전체화면</button>
+  </div>
 
-  <script>
-    (() => {
-      const button = document.getElementById('fullscreenBtn');
-      const root = document.documentElement;
+  <div id="resourceDp" class="glass">💧 DP <span id="dpValue">12</span></div>
+  <div id="resourceGold" class="glass">🪙 <span id="goldValue">150</span> G</div>
 
-      const activeFullscreen = () =>
-        document.fullscreenElement || document.webkitFullscreenElement || null;
+  <div id="unitBar" class="glass"></div>
+  <div id="hint">유닛 카드를 선택하세요</div>
 
-      const enterFullscreen = async () => {
-        if (root.requestFullscreen) {
-          await root.requestFullscreen({ navigationUI: 'hide' }).catch(() => root.requestFullscreen());
-        } else if (root.webkitRequestFullscreen) {
-          root.webkitRequestFullscreen();
-        } else {
-          throw new Error('Fullscreen API unsupported');
-        }
+  <section id="unitPanel" class="glass">
+    <h3 id="unitName">유닛</h3>
+    <div id="unitStats"></div>
+    <div id="spBar"><div id="spFill"></div></div>
+    <div class="panelBtns">
+      <button id="skillBtn" type="button">스킬</button>
+      <button id="upgradeBtn" type="button">강화</button>
+      <button id="retreatBtn" type="button">퇴각</button>
+    </div>
+  </section>
 
-        if (screen.orientation && screen.orientation.lock) {
-          screen.orientation.lock('landscape').catch(() => {});
-        }
-      };
+  <div id="directionPad">
+    <button class="dir" data-dir="up" type="button">↑</button>
+    <button class="dir" data-dir="down" type="button">↓</button>
+    <button class="dir" data-dir="left" type="button">←</button>
+    <button class="dir" data-dir="right" type="button">→</button>
+    <button id="dirCancel" type="button">×</button>
+  </div>
 
-      const exitFullscreen = async () => {
-        if (document.exitFullscreen) {
-          await document.exitFullscreen();
-        } else if (document.webkitExitFullscreen) {
-          document.webkitExitFullscreen();
-        }
-        if (screen.orientation && screen.orientation.unlock) {
-          try { screen.orientation.unlock(); } catch (_) {}
-        }
-      };
+  <div id="toast"></div>
 
-      const syncButton = () => {
-        const on = !!activeFullscreen();
-        button.textContent = on ? '↙ 전체화면 해제' : '⛶ 전체화면';
-        button.setAttribute('aria-label', on ? '전체화면 해제' : '전체화면 전환');
-      };
+  <div id="startOverlay">
+    <div class="modal glass">
+      <h1>FEMDOM RUSH</h1>
+      <h2>MAP 01 · 붉은 초원 관문</h2>
+      <p>DP로 여성 유닛을 배치하고, 방향을 정한 뒤 적의 진군을 막으세요.<br>
+      적 처치 Gold로 현장 강화, SP가 차면 스킬 발동, 다음 웨이브는 조기 호출할 수 있습니다.</p>
+      <button id="startBtn" type="button">전투 시작</button>
+    </div>
+  </div>
 
-      button.addEventListener('click', async () => {
-        try {
-          if (activeFullscreen()) await exitFullscreen();
-          else await enterFullscreen();
-        } catch (err) {
-          button.textContent = '전체화면 미지원';
-          setTimeout(syncButton, 1600);
-        }
-      });
+  <div id="resultOverlay">
+    <div class="modal glass">
+      <h1 id="resultTitle">승리!</h1>
+      <p id="resultStats"></p>
+      <button id="retryBtn" type="button" class="glass" style="padding:11px 28px;font-weight:900">재도전</button>
+    </div>
+  </div>
+</main>
 
-      document.addEventListener('fullscreenchange', syncButton);
-      document.addEventListener('webkitfullscreenchange', syncButton);
-      syncButton();
-    })();
-  </script>
+<script>
+(() => {
+  const button=document.getElementById("fullscreenBtn"),root=document.documentElement;
+  const active=()=>document.fullscreenElement||document.webkitFullscreenElement||null;
+  const sync=()=>{button.textContent=active()?"↙ 전체화면 해제":"⛶ 전체화면";};
+  button.addEventListener("click",async()=>{
+    try{
+      if(active()){
+        if(document.exitFullscreen)await document.exitFullscreen();
+        else if(document.webkitExitFullscreen)document.webkitExitFullscreen();
+        if(screen.orientation?.unlock)try{screen.orientation.unlock();}catch(_){}
+      }else{
+        if(root.requestFullscreen)await root.requestFullscreen({navigationUI:"hide"}).catch(()=>root.requestFullscreen());
+        else if(root.webkitRequestFullscreen)root.webkitRequestFullscreen();
+        if(screen.orientation?.lock)screen.orientation.lock("landscape").catch(()=>{});
+      }
+    }catch(_){}
+    sync();
+  });
+  document.addEventListener("fullscreenchange",sync);
+  document.addEventListener("webkitfullscreenchange",sync);
+  sync();
+})();
+</script>
+<script src="game.js"></script>
 </body>
 </html>
