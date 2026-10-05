@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
+  <meta name="theme-color" content="#111318" />
+  <title>FEMDOM RUSH</title>
+  <style>
+    :root{color-scheme:dark}
+    *{box-sizing:border-box}
+    html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#111318}
+    body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;touch-action:manipulation}
+    #gameRoot{
+      position:relative;width:100%;height:100dvh;min-height:100%;
+      display:grid;place-items:center;overflow:hidden;
+      background:
+        radial-gradient(circle at 50% 35%,#3a241f 0,#1b1718 42%,#0d0f13 100%);
+    }
+    #placeholder{text-align:center;color:#f5dfbd;text-shadow:0 2px 6px #000}
+    #placeholder h1{margin:0 0 8px;font-size:clamp(30px,6vw,74px);letter-spacing:.06em}
+    #placeholder p{margin:0;opacity:.72;font-size:clamp(13px,2vw,20px)}
+    #fullscreenBtn{
+      position:fixed;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));
+      z-index:9999;min-width:112px;height:44px;padding:0 14px;border:1px solid #d7aa58;border-radius:12px;
+      background:linear-gradient(#5b3028,#321a19);color:#fff1cc;font-weight:800;font-size:14px;
+      box-shadow:0 4px 16px #0008,inset 0 0 0 1px #8c5536;cursor:pointer;
+      -webkit-tap-highlight-color:transparent;
+    }
+    #fullscreenBtn:active{transform:scale(.96)}
+    :fullscreen #gameRoot,:-webkit-full-screen #gameRoot{width:100vw;height:100vh}
+  </style>
+</head>
+<body>
+  <main id="gameRoot">
+    <div id="placeholder">
+      <h1>FEMDOM RUSH</h1>
+      <p>전투 프로토타입 준비 중</p>
+    </div>
+  </main>
+
+  <button id="fullscreenBtn" type="button" aria-label="전체화면 전환">⛶ 전체화면</button>
+
+  <script>
+    (() => {
+      const button = document.getElementById('fullscreenBtn');
+      const root = document.documentElement;
+
+      const activeFullscreen = () =>
+        document.fullscreenElement || document.webkitFullscreenElement || null;
+
+      const enterFullscreen = async () => {
+        if (root.requestFullscreen) {
+          await root.requestFullscreen({ navigationUI: 'hide' }).catch(() => root.requestFullscreen());
+        } else if (root.webkitRequestFullscreen) {
+          root.webkitRequestFullscreen();
+        } else {
+          throw new Error('Fullscreen API unsupported');
+        }
+
+        if (screen.orientation && screen.orientation.lock) {
+          screen.orientation.lock('landscape').catch(() => {});
+        }
+      };
+
+      const exitFullscreen = async () => {
+        if (document.exitFullscreen) {
+          await document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+        if (screen.orientation && screen.orientation.unlock) {
+          try { screen.orientation.unlock(); } catch (_) {}
+        }
+      };
+
+      const syncButton = () => {
+        const on = !!activeFullscreen();
+        button.textContent = on ? '↙ 전체화면 해제' : '⛶ 전체화면';
+        button.setAttribute('aria-label', on ? '전체화면 해제' : '전체화면 전환');
+      };
+
+      button.addEventListener('click', async () => {
+        try {
+          if (activeFullscreen()) await exitFullscreen();
+          else await enterFullscreen();
+        } catch (err) {
+          button.textContent = '전체화면 미지원';
+          setTimeout(syncButton, 1600);
+        }
+      });
+
+      document.addEventListener('fullscreenchange', syncButton);
+      document.addEventListener('webkitfullscreenchange', syncButton);
+      syncButton();
+    })();
+  </script>
+</body>
+</html>
