@@ -217,6 +217,26 @@ const Loading = {
   },
 };
 
+function worldMapBackButton(x, y, label, fn) {
+  const w = 154, h = Math.max(46, partH('banner_bottom', 154));
+  const hv = hovered(x, y, w, h);
+  ctx.save();
+  if (hv) { ctx.translate(x + w / 2, y + h / 2); ctx.scale(1.035, 1.035); ctx.translate(-(x + w / 2), -(y + h / 2)); }
+  ctx.shadowColor = 'rgba(0,0,0,.42)'; ctx.shadowBlur = 12; ctx.shadowOffsetY = 4;
+  part('banner_bottom', x, y, w);
+  ctx.restore();
+
+  // 왼쪽 화살표
+  ctx.save();
+  ctx.translate(x + 28, y + h / 2);
+  ctx.fillStyle = '#6b2a1f';
+  ctx.beginPath(); ctx.moveTo(-9, 0); ctx.lineTo(3, -8); ctx.lineTo(3, -3); ctx.lineTo(12, -3); ctx.lineTo(12, 3); ctx.lineTo(3, 3); ctx.lineTo(3, 8); ctx.closePath(); ctx.fill();
+  ctx.restore();
+
+  text(label, x + 93, y + h * .48, { size: 17, color: '#4b2418', stroke: 'rgba(255,247,224,.95)', lw: 3, font: SERIF });
+  hit(x, y, w, h, fn);
+}
+
 /* ═══════════════ 타이틀 + 월드맵 ═══════════════ */
 const World = {
   enter(a) { this.mode = a.mode; this.sel = -1; this.hoverId = 0; this.t = 0; this.fk = this.mode === 'title' ? 0 : 1; this.logoK = this.fk; },
@@ -339,7 +359,7 @@ const World = {
     } else {
       ctx.globalAlpha = k;
       part('logo', 18, 8, 292);
-      button(18, 650, 132, 48, '← 타이틀', () => { this.mode = 'title'; }, { size: 18 });
+      worldMapBackButton(18, 642, '타이틀', () => { this.mode = 'title'; });
       button(GW - 150, 650, 132, 48, '전체화면', toggleFullscreen, { size: 18 });
       ctx.globalAlpha = 1;
     }
