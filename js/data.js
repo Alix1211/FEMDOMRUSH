@@ -6,13 +6,13 @@ const GW = 1280, GH = 720;
 /* ── 월드 7개 ── */
 const WORLDS = [
   // 월드맵 배치: 케인 시안 기준 (1280×720)
-  { id: 'w1_harbor',  n: 1, name: '부두',  slot: { cx: 1042, cy: 500, w: 248 }, bob: [7, 5.2, 0.0] },
-  { id: 'w2_forest',  n: 2, name: '숲',    slot: { cx: 720,  cy: 575, w: 248 }, bob: [9, 6.1, 1.3] },
-  { id: 'w3_desert',  n: 3, name: '사막',  slot: { cx: 400,  cy: 520, w: 252 }, bob: [6, 4.7, 2.4] },
-  { id: 'w4_meadow',  n: 4, name: '초원',  slot: { cx: 360,  cy: 285, w: 300 }, bob: [10, 6.8, 0.7] },
-  { id: 'w5_village', n: 5, name: '마을',  slot: { cx: 655,  cy: 382, w: 248 }, bob: [8, 5.6, 3.1] },
-  { id: 'w6_castle',  n: 6, name: '왕성',  slot: { cx: 705,  cy: 178, w: 300 }, bob: [7, 7.3, 1.9] },
-  { id: 'w7_demon',   n: 7, name: '마계',  slot: { cx: 1080, cy: 205, w: 300 }, bob: [9, 4.9, 4.2] },
+  { id: 'w1_harbor',  n: 1, name: '부두',  slot: { cx: 1042, cy: 500, w: 278 }, bob: [7, 5.2, 0.0] },
+  { id: 'w2_forest',  n: 2, name: '숲',    slot: { cx: 720,  cy: 575, w: 278 }, bob: [9, 6.1, 1.3] },
+  { id: 'w3_desert',  n: 3, name: '사막',  slot: { cx: 400,  cy: 520, w: 282 }, bob: [6, 4.7, 2.4] },
+  { id: 'w4_meadow',  n: 4, name: '초원',  slot: { cx: 360,  cy: 285, w: 332 }, bob: [10, 6.8, 0.7] },
+  { id: 'w5_village', n: 5, name: '마을',  slot: { cx: 655,  cy: 382, w: 278 }, bob: [8, 5.6, 3.1] },
+  { id: 'w6_castle',  n: 6, name: '왕성',  slot: { cx: 705,  cy: 178, w: 334 }, bob: [7, 7.3, 1.9] },
+  { id: 'w7_demon',   n: 7, name: '마계',  slot: { cx: 1080, cy: 205, w: 334 }, bob: [9, 4.9, 4.2] },
 ];
 
 /* 스테이지 화면 노드 좌표 (월드별 10개, 1280×720 기준) */
