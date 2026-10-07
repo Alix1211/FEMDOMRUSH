@@ -32,9 +32,10 @@ const ROSTER_CLASS = {
   u01: 'sword', u02: 'sword', u03: 'mage',  u04: 'shield', u05: 'sword', u06: 'healer', u07: 'mage', u08: 'mage',
   u09: 'sword', u10: 'mage',  u11: 'archer', u12: 'sword', u13: 'sword', u14: 'archer', u15: 'sword', u16: 'mage',
   u17: 'archer', u18: 'sword', u19: 'sword', u20: 'archer', u21: 'shield', u22: 'healer', u23: 'shield',
+  u24: 'healer', u25: 'sword', u26: 'shield', u27: 'sword',
 };
 /* ── 이름 배정 (문서 '세계관 바이블'에 나오는 이름만 사용, 그림 기준 임시 배정 — 나머지는 번호로 표기) ── */
-const ALLY_NAMES = { u23: '클레어', u11: '벨루가', u13: '자하라', u21: '프레야', u12: '릴리스', u06: '실비아', u16: '셀렌', u18: '마샤' };
+const ALLY_NAMES = { u23: '클레어', u11: '벨루가', u13: '자하라', u21: '프레야', u12: '릴리스', u06: '실비아', u16: '셀렌', u18: '마샤', u24: '아네트', u25: '로나', u26: '바르샤', u27: '미라' };
 /* 남성 히어로: 적으로 싸운 뒤 '정화 완료'하면 합류 (아직 합류 기능은 미구현, 도감 표기용) */
 const MALE_HEROES = { e11: '렌', e14: '이그니스', e10: '카이단', e04: '그로크', e32: '루시안' };
 const ROSTER = Object.keys(ROSTER_CLASS).map((k, i) => ({ key: k, no: i + 1, cls: ROSTER_CLASS[k], label: (ALLY_NAMES[k] || 'No.' + String(i + 1).padStart(2, '0')) }));

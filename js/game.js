@@ -571,8 +571,8 @@ function drawPrep(p) {
   const roster = { x: inner.x, y: inner.y + inner.h * .72, w: inner.w, h: inner.h * .28 };
   label('아군 명단 (' + ROSTER.length + '명)', roster.x + roster.w * .02, roster.y, { size: 15, align: 'left' });
   ROSTER.forEach((r, i) => {
-    const row = i < 12 ? 0 : 1, col = i < 12 ? i : i - 12;
-    const cw = roster.w * .044, x = roster.x + roster.w * (.02 + col * .082), y = roster.y + roster.h * (.12 + row * .46), inDeck = p.deck.includes(r.key);
+    const row = i < 14 ? 0 : 1, col = i < 14 ? i : i - 14;
+    const cw = roster.w * .044, x = roster.x + roster.w * (.02 + col * .068), y = roster.y + roster.h * (.12 + row * .46), inDeck = p.deck.includes(r.key);
     const h = drawCard(x, y, cw, r, { cost: CLASSES[r.cls].cost, dim: inDeck ? .55 : 0, lift: false });
     if (hovered(x, y, cw, h)) hoveredUnit = { unit: r, x, y, w: cw };
     hit(x, y, cw, h, () => {
@@ -624,7 +624,7 @@ function drawModal() {
   } else if (modal.type === 'collection') {
     const x = 70, y = 28, w = 1140, h = 664; panel(x, y, w, h); hit(x, y, w, h, () => { });
     text('도감', x + 60, y + 40, { size: 32, color: COL.gold, font: SERIF });
-    button(x + 140, y + 14, 120, 44, '아군 23', () => { modal.tab = 'units'; modal.sel = 0; }, { size: 18, kind: modal.tab === 'units' ? 'primary' : 'dark' });
+    button(x + 140, y + 14, 120, 44, '아군 ' + ROSTER.length, () => { modal.tab = 'units'; modal.sel = 0; }, { size: 18, kind: modal.tab === 'units' ? 'primary' : 'dark' });
     button(x + 270, y + 14, 120, 44, '적 34', () => { modal.tab = 'enemies'; modal.sel = 0; }, { size: 18, kind: modal.tab === 'enemies' ? 'primary' : 'dark' });
     button(x + w - 130, y + 14, 100, 44, '닫기', () => { modal = null; }, { size: 18 });
     const keys = modal.tab === 'units' ? ROSTER.map(r => r.key) : Object.keys(UMETA.enemies).sort();
