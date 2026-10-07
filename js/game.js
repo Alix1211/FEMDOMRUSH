@@ -538,9 +538,14 @@ function drawPrep(p) {
   drawStars(record.x + record.w / 2, record.y + record.h * .66, starsOf(p.world, st.no), 24);
   const deck = { x: inner.x, y: inner.y + inner.h * .425, w: inner.w * .66, h: inner.h * .265 };
   label('출격 덱 (' + p.deck.length + ' / 6)  ·  카드를 눌러 편성', deck.x + deck.w * .03, deck.y, { size: 15, align: 'left' });
+  let hoveredUnit = null;
   for (let i = 0; i < 6; i++) {
     const cw = deck.w * .105, x = deck.x + deck.w * (.03 + i * .155), y = deck.y + deck.h * .13, k = p.deck[i];
-    if (k) { const r = ROSTER.find(q => q.key === k); const h = drawCard(x, y, cw, r, { cost: CLASSES[r.cls].cost, label: r.label }); hit(x, y, cw, h, () => { p.deck.splice(i, 1); }); }
+    if (k) {
+      const r = ROSTER.find(q => q.key === k), h = drawCard(x, y, cw, r, { cost: CLASSES[r.cls].cost, label: r.label });
+      if (hovered(x, y, cw, h)) hoveredUnit = { unit: r, x, y, w: cw };
+      hit(x, y, cw, h, () => { p.deck.splice(i, 1); });
+    }
     else drawCard(x, y, cw, {}, { locked: true });
   }
   const prepButton = (r, title, fn, disabled = false) => {
@@ -575,6 +580,28 @@ function drawPrep(p) {
       else toast('덱은 6명까지입니다');
     });
   });
+  // 마지막에 그려 카드와 장식 위에서도 정보가 읽히도록 한다.
+  if (hoveredUnit) {
+    const r = hoveredUnit.unit, c = CLASSES[r.cls], stats = unitStats(r.cls, p.world);
+    const tip = { w: inner.w * .34, h: inner.h * .36 };
+    tip.x = Math.max(inner.x, Math.min(inner.x + inner.w - tip.w, hoveredUnit.x + hoveredUnit.w / 2 - tip.w / 2));
+    tip.y = Math.max(inner.y, hoveredUnit.y - tip.h - deck.h * .08);
+    ctx.save();
+    ctx.shadowColor = 'rgba(45,20,10,.4)'; ctx.shadowBlur = 14; ctx.shadowOffsetY = 4;
+    rr(tip.x, tip.y, tip.w, tip.h, 12); ctx.fillStyle = '#fff1d5'; ctx.fill();
+    ctx.shadowColor = 'transparent'; ctx.lineWidth = 3; ctx.strokeStyle = COL.gold2; ctx.stroke();
+    rr(tip.x + 5, tip.y + 5, tip.w - 10, tip.h - 10, 8); ctx.lineWidth = 1; ctx.strokeStyle = '#d4af70'; ctx.stroke();
+    label(r.label + '  ·  ' + c.name, tip.x + tip.w * .07, tip.y + tip.h * .16, { size: 20, align: 'left', color: '#8e2525' });
+    const rows = [
+      '비용 ' + c.cost + '  ·  저지 ' + c.block,
+      '체력 ' + stats.hp + '  ·  방어력 ' + stats.def,
+      (c.heal ? '치유력 ' : '공격력 ') + stats.atk + '  ·  사거리 ' + c.range,
+      '공격 간격 ' + c.itv + '초  ·  ' + c.skillName
+    ];
+    rows.forEach((line, i) => label(line, tip.x + tip.w * .07, tip.y + tip.h * (.36 + i * .16), { size: 15, align: 'left', weight: 600 }));
+    ctx.restore();
+  }
+
 }
 
 /* ═══════════════ 모달 (설정 / 도감) ═══════════════ */
