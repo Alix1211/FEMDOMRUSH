@@ -33,7 +33,11 @@ const ROSTER_CLASS = {
   u09: 'sword', u10: 'mage',  u11: 'archer', u12: 'sword', u13: 'sword', u14: 'archer', u15: 'sword', u16: 'mage',
   u17: 'archer', u18: 'sword', u19: 'sword', u20: 'archer', u21: 'shield', u22: 'healer', u23: 'shield',
 };
-const ROSTER = Object.keys(ROSTER_CLASS).map((k, i) => ({ key: k, no: i + 1, cls: ROSTER_CLASS[k], label: 'No.' + String(i + 1).padStart(2, '0') }));
+/* ── 이름 배정 (문서 '세계관 바이블'에 나오는 이름만 사용, 그림 기준 임시 배정 — 나머지는 번호로 표기) ── */
+const ALLY_NAMES = { u23: '클레어', u11: '벨루가', u13: '자하라', u21: '프레야', u12: '릴리스', u06: '실비아', u16: '셀렌', u18: '마샤' };
+/* 남성 히어로: 적으로 싸운 뒤 '정화 완료'하면 합류 (아직 합류 기능은 미구현, 도감 표기용) */
+const MALE_HEROES = { e11: '렌', e14: '이그니스', e10: '카이단', e04: '그로크', e32: '루시안' };
+const ROSTER = Object.keys(ROSTER_CLASS).map((k, i) => ({ key: k, no: i + 1, cls: ROSTER_CLASS[k], label: (ALLY_NAMES[k] || 'No.' + String(i + 1).padStart(2, '0')) }));
 const DEFAULT_DECK = ['u23', 'u04', 'u11', 'u01', 'u07', 'u06'];
 
 /* ── 적 (남성 34종 스프라이트를 5가지 유형으로 분류) ── */
@@ -45,13 +49,13 @@ const ENEMY_TYPES = {
   boss:   { hp: 3200, atk: 46, def: 14, spd: 28, range: 0,   itv: 1.4, gold: 160, size: 150, lifeCost: 3 },
 };
 const ENEMY_POOL = {
-  w1: { grunt: ['e01', 'e04', 'e19'], fast: ['e20', 'e21'], heavy: ['e22'], ranged: ['e30'], boss: ['e18'] },
-  w2: { grunt: ['e19', 'e23', 'e34'], fast: ['e20', 'e10', 'e21'], heavy: ['e22', 'e24'], ranged: ['e05'], boss: ['e24'] },
+  w1: { grunt: ['e01', 'e19'], fast: ['e20', 'e21'], heavy: ['e22'], ranged: ['e30'], boss: ['e18'] },
+  w2: { grunt: ['e19', 'e23', 'e34'], fast: ['e20', 'e21'], heavy: ['e22', 'e24'], ranged: ['e05'], boss: ['e24'] },
   w3: { grunt: ['e02', 'e09', 'e31'], fast: ['e03', 'e28', 'e34'], heavy: ['e18', 'e09'], ranged: ['e30', 'e31'], boss: ['e06'] },
-  w4: { grunt: ['e11', 'e12', 'e15'], fast: ['e16', 'e10', 'e17'], heavy: ['e14', 'e18'], ranged: ['e13', 'e07'], boss: ['e14'] },
-  w5: { grunt: ['e01', 'e11', 'e04'], fast: ['e02', 'e29', 'e25'], heavy: ['e22', 'e18'], ranged: ['e13', 'e30', 'e08'], boss: ['e18'] },
-  w6: { grunt: ['e11', 'e12', 'e15'], fast: ['e29', 'e33', 'e03'], heavy: ['e14', 'e24'], ranged: ['e07', 'e08', 'e32'], boss: ['e29'] },
-  w7: { grunt: ['e23', 'e33', 'e32'], fast: ['e29', 'e33', 'e34'], heavy: ['e24', 'e09'], ranged: ['e32', 'e08', 'e05'], boss: ['e26'] },
+  w4: { grunt: ['e12', 'e15'], fast: ['e16', 'e20', 'e17'], heavy: ['e18'], ranged: ['e13', 'e07'], boss: ['e18'] },
+  w5: { grunt: ['e01', 'e12'], fast: ['e02', 'e29', 'e25'], heavy: ['e22', 'e18'], ranged: ['e13', 'e30', 'e08'], boss: ['e18'] },
+  w6: { grunt: ['e12', 'e15'], fast: ['e29', 'e33', 'e03'], heavy: ['e18', 'e24'], ranged: ['e07', 'e08', 'e23'], boss: ['e29'] },
+  w7: { grunt: ['e23', 'e33'], fast: ['e29', 'e33', 'e34'], heavy: ['e24', 'e09'], ranged: ['e23', 'e08', 'e05'], boss: ['e26'] },
 };
 
 /* ── 스테이지 70개 자동 구성 (월드 7 × 10, 전투 맵은 월드당 5장을 2번씩) ── */

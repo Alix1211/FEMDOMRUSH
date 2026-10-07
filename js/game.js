@@ -632,15 +632,16 @@ function drawModal() {
     keys.forEach((k, i) => {
       const cx = x + 30 + (i % cols) * 90, cy = y + 76 + Math.floor(i / cols) * 88, on = modal.sel === i;
       rr(cx, cy, cw + 8, ch + 4, 10); ctx.fillStyle = on ? 'rgba(255,214,120,.28)' : 'rgba(0,0,0,.3)'; ctx.fill(); ctx.lineWidth = on ? 3 : 1.5; ctx.strokeStyle = on ? COL.gold : 'rgba(214,170,90,.4)'; ctx.stroke();
-      drawPortrait(modal.tab, k, cx + 4, cy + 4, cw, ch - 6); text(k.slice(1), cx + 14, cy + ch - 8, { size: 13, lw: 3 });
+      drawPortrait(modal.tab, k, cx + 4, cy + 4, cw, ch - 6); text(modal.tab === 'units' ? (ALLY_NAMES[k] || k.slice(1)) : (MALE_HEROES[k] || k.slice(1)), cx + 4 + cw / 2, cy + ch - 8, { size: 14, lw: 3 });
       hit(cx, cy, cw + 8, ch + 4, () => { modal.sel = i; });
     });
     const sk = keys[modal.sel], by = y + 76 + Math.ceil(keys.length / cols) * 88 + 6;
     if (sk) {
+      if (modal.tab === 'enemies' && MALE_HEROES[sk]) text(MALE_HEROES[sk] + '  ·  정화 후 합류하는 남성 히어로', x + w / 2, by + 300, { size: 20, color: COL.gold, stroke: false });
       const m = UMETA[modal.tab][sk]; let ox = x + 60;
       for (let d = 0; d < 4; d++) { const dw = m.w[d] * 250 / m.h; drawSprite(modal.tab, sk, d, ox + dw / 2, by + 250, 250); ox += dw + 20; }
       text(['정면', '뒷면', '왼쪽', '오른쪽'].join('   '), x + w / 2, by + 270, { size: 14, color: '#cbb892', stroke: false });
-      if (modal.tab === 'units') { const r = ROSTER.find(q => q.key === sk), c = CLASSES[r.cls]; text(r.label + '  ·  ' + c.name + ' (임시)  ·  비용 ' + c.cost, x + w - 40, y + 100 + 0, { align: 'right', size: 18, color: COL.gold, stroke: false }); }
+      if (modal.tab === 'units') { const r = ROSTER.find(q => q.key === sk), c = CLASSES[r.cls]; text(r.label + '  ·  ' + c.name + ' (임시)  ·  비용 ' + c.cost, x + w / 2, by + 300, { size: 20, color: COL.gold, stroke: false }); }
     }
   }
 }
