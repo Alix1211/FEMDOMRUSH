@@ -218,7 +218,7 @@ const Loading = {
 };
 
 function worldMapBackButton(x, y, label, fn) {
-  const w = 154, h = Math.max(46, partH('banner_bottom', 154));
+  const w = 176, h = Math.max(48, partH('banner_bottom', 176));
   const hv = hovered(x, y, w, h);
   ctx.save();
   if (hv) { ctx.translate(x + w / 2, y + h / 2); ctx.scale(1.035, 1.035); ctx.translate(-(x + w / 2), -(y + h / 2)); }
@@ -226,14 +226,17 @@ function worldMapBackButton(x, y, label, fn) {
   part('banner_bottom', x, y, w);
   ctx.restore();
 
-  // 왼쪽 화살표
+  // 크림색 본문 영역 기준으로 화살표와 글씨를 따로 정렬
+  const cy = y + h * 0.47;
   ctx.save();
-  ctx.translate(x + 28, y + h / 2);
+  ctx.translate(x + 31, cy);
   ctx.fillStyle = '#6b2a1f';
-  ctx.beginPath(); ctx.moveTo(-9, 0); ctx.lineTo(3, -8); ctx.lineTo(3, -3); ctx.lineTo(12, -3); ctx.lineTo(12, 3); ctx.lineTo(3, 3); ctx.lineTo(3, 8); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(-10, 0); ctx.lineTo(3, -8); ctx.lineTo(3, -3); ctx.lineTo(13, -3); ctx.lineTo(13, 3); ctx.lineTo(3, 3); ctx.lineTo(3, 8); ctx.closePath(); ctx.fill();
   ctx.restore();
 
-  text(label, x + 93, y + h * .48, { size: 17, color: '#4b2418', stroke: 'rgba(255,247,224,.95)', lw: 3, font: SERIF });
+  // 화살표를 제외한 실제 글자 영역의 중앙
+  const textCx = x + 105;
+  text(label, textCx, cy, { size: 18, color: '#4b2418', stroke: false, font: SERIF });
   hit(x, y, w, h, fn);
 }
 
@@ -359,7 +362,7 @@ const World = {
     } else {
       ctx.globalAlpha = k;
       part('logo', 18, 8, 292);
-      worldMapBackButton(18, 642, '타이틀', () => { this.mode = 'title'; });
+      worldMapBackButton(16, 640, '타이틀', () => { this.mode = 'title'; });
       button(GW - 150, 650, 132, 48, '전체화면', toggleFullscreen, { size: 18 });
       ctx.globalAlpha = 1;
     }
@@ -404,14 +407,14 @@ const Stage = {
 
     // 상단 UI — 시안처럼 크게 하나의 제목판으로 정리
     part('logo', 16, 8, 216);
-    worldMapBackButton(18, 112, '월드맵', () => go(World, { mode: 'map' }));
+    worldMapBackButton(16, 112, '월드맵', () => go(World, { mode: 'map' }));
 
     const bw = 520, bx = GW / 2 - bw / 2, bh = partH('banner_top', bw);
     part('banner_top', bx, -8, bw);
-    text(this.w + '. ' + w.name, GW / 2 - 72, 72, {
-      size: 34, color: '#5b2a14', stroke: 'rgba(255,244,215,.96)', lw: 5, font: SERIF
+    text(this.w + '. ' + w.name, GW / 2 - 82, 76, {
+      size: 31, color: '#5b2a14', stroke: false, font: SERIF
     });
-    text('월드 ' + this.w + '  ·  ★ ' + worldStars(this.w) + ' / 30', GW / 2 + 128, 72, {
+    text('월드 ' + this.w + '  ·  ★ ' + worldStars(this.w) + ' / 30', GW / 2 + 126, 76, {
       size: 15, color: '#6b4528', stroke: false
     });
 
