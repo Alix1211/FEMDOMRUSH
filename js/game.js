@@ -193,7 +193,7 @@ function toggleFullscreen() {
 }
 
 /* ═══════════════ 로딩 화면 ═══════════════ */
-const ESSENTIAL = () => ['assets/worldmap/sky.webp', ...WORLDS.map(w => 'assets/worldmap/island_' + w.id + '.webp'),
+const ESSENTIAL = () => ['assets/ui/title_key.webp', 'assets/worldmap/sky.webp', ...WORLDS.map(w => 'assets/worldmap/island_' + w.id + '.webp'),
   ...['logo', 'banner_top', 'banner_bottom', 'badge_star', 'btn_speed', 'btn_pause', 'btn_fullscreen', 'wave_bar', 'heart_panel', 'gem_panel', 'info_panel', 'deploy_spot', 'card_sword', 'card_shield', 'card_archer', 'card_mage', 'card_locked', 'skill_1', 'skill_2', 'skill_3', 'arrow_up', 'arrow_down', 'badge_warn', 'chest'].map(n => 'assets/ui/parts/' + n + '.webp')];
 const Loading = {
   enter() { this.t = 0; this.started = false; },
@@ -218,8 +218,13 @@ const Loading = {
 
 /* ═══════════════ 타이틀 + 월드맵 ═══════════════ */
 const World = {
-  enter(a) { this.mode = a.mode; this.sel = -1; this.t = 0; this.logoK = this.mode === 'title' ? 0 : 1; },
-  update(dt) { this.t += dt; this.logoK += ((this.mode === 'title' ? 0 : 1) - this.logoK) * Math.min(1, dt * 7); },
+  enter(a) { this.mode = a.mode; this.sel = -1; this.t = 0; this.fk = this.mode === 'title' ? 0 : 1; this.logoK = this.fk; },
+  update(dt) {
+    this.t += dt;
+    const tg = this.mode === 'title' ? 0 : 1, step = dt / 1.3;   // 약 1.3초에 걸쳐 스르륵 교차
+    this.fk += Math.max(-step, Math.min(step, tg - this.fk));
+    this.logoK = this.fk * this.fk * (3 - 2 * this.fk);          // 부드러운 가감속
+  },
   islandRect(w) {
     const sl = w.slot, bob = w.bob, im = img('assets/worldmap/island_' + w.id + '.webp'); if (!im) return null;
     const dy = Math.sin(this.t * 2 * Math.PI / bob[1] + bob[2]) * bob[0], dx = Math.cos(this.t * 2 * Math.PI / (bob[1] * 1.7) + bob[2]) * 2.5;
@@ -228,19 +233,27 @@ const World = {
     return { im, x: sl.cx - ww / 2 + dx, y: sl.cy - hh / 2 + dy, w: ww, h: hh, dy };
   },
   draw() {
-    const t = this.t;
-    cover(img('assets/worldmap/sky.webp'), 1, 1.05, Math.sin(t * 0.07) * 14, Math.cos(t * 0.05) * 5);
+    const t = this.t, K = this.logoK, showMap = K > 0.02;
+    // 타이틀 일러스트 (대치 장면) — 천천히 숨 쉬듯 움직임
+    if (K < 0.98) {
+      cover(img('assets/ui/title_key.webp'), 1, 1.05 + Math.sin(t * 0.35) * 0.012, Math.sin(t * 0.21) * 12, Math.cos(t * 0.17) * 6);
+      const bg = ctx.createLinearGradient(0, GH - 190, 0, GH); bg.addColorStop(0, 'rgba(10,6,8,0)'); bg.addColorStop(1, 'rgba(10,6,8,.62)');
+      ctx.fillStyle = bg; ctx.fillRect(0, GH - 190, GW, 190);
+      const vg = ctx.createRadialGradient(GW / 2, GH / 2, GH * 0.45, GW / 2, GH / 2, GW * 0.7); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.28)');
+      ctx.fillStyle = vg; ctx.fillRect(0, 0, GW, GH);
+    }
+    if (showMap) { cover(img('assets/worldmap/sky.webp'), K, 1.05, Math.sin(t * 0.07) * 14, Math.cos(t * 0.05) * 5); ctx.globalAlpha = K; }
     // 구름 느낌의 옅은 빛
-    const gl = ctx.createLinearGradient(0, 0, 0, GH); gl.addColorStop(0, 'rgba(255,255,255,.06)'); gl.addColorStop(1, 'rgba(20,50,110,.12)'); ctx.fillStyle = gl; ctx.fillRect(0, 0, GW, GH);
+    if (showMap) { const gl = ctx.createLinearGradient(0, 0, 0, GH); gl.addColorStop(0, 'rgba(255,255,255,.06)'); gl.addColorStop(1, 'rgba(20,50,110,.12)'); ctx.fillStyle = gl; ctx.fillRect(0, 0, GW, GH); }
     // 섬 사이 점선 길
     ctx.save(); ctx.fillStyle = 'rgba(255,244,200,.9)';
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; showMap && i < 6; i++) {
       const a = WORLDS[i].slot, b = WORLDS[i + 1].slot;
       for (let k = 1; k < 9; k++) { const u = k / 9; const x = a.cx + (b.cx - a.cx) * u, y = a.cy + (b.cy - a.cy) * u - Math.sin(u * Math.PI) * 30; ctx.beginPath(); ctx.arc(x, y + 60, 2.6 + Math.sin(t * 3 + k + i) * 0.7, 0, 7); ctx.fill(); }
     }
     ctx.restore();
     // 섬
-    this.hoverId = 0; const order = WORLDS.slice().sort((a, b) => a.slot.cy - b.slot.cy);
+    this.hoverId = 0; const order = showMap ? WORLDS.slice().sort((a, b) => a.slot.cy - b.slot.cy) : [];
     for (const w of order) {
       const r = this.islandRect(w); if (!r) continue;
       const open = worldOpen(w.n);
@@ -265,6 +278,7 @@ const World = {
         if (hovered(hx, hy, hw, hh)) this.hoverId = w.n;
       }
     }
+    ctx.globalAlpha = 1;
     // 호버/선택 라벨
     if (this.mode === 'map') {
       const id = this.hoverId || (this.sel >= 0 ? this.sel + 1 : 0);
@@ -278,7 +292,7 @@ const World = {
       }
     }
     // 로고 / 버튼
-    const k = this.logoK, lw = 540 - 250 * k, lx = GW / 2 - lw / 2 - (GW / 2 - lw / 2 - 18) * k, ly = 6 + 4 * k;
+    const k = this.logoK, lw = 500 - 210 * k, lx = GW / 2 - lw / 2 - (GW / 2 - lw / 2 - 18) * k, ly = 6 + 4 * k;
     part('logo', lx, ly, lw);
     if (this.mode === 'title') {
       const by = 616, a = 1 - k;
@@ -289,10 +303,12 @@ const World = {
       button(974, by + 8, 170, 62, '전체화면', toggleFullscreen, { size: 22 });
       ctx.globalAlpha = 1;
     } else {
+      ctx.globalAlpha = k;
       const hw = 360, hx = GW / 2 - hw / 2 + 120;
       text('모험할 섬을 선택하세요', hx + hw / 2 - 120, 40, { size: 26, color: COL.gold });
       button(22, 640, 150, 54, '← 타이틀', () => { this.mode = 'title'; }, { size: 20 });
       button(GW - 172, 640, 150, 54, '전체화면', toggleFullscreen, { size: 20 });
+      ctx.globalAlpha = 1;
     }
     drawModal();
   },
