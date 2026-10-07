@@ -411,11 +411,11 @@ const Stage = {
 
     const bw = 520, bx = GW / 2 - bw / 2, bh = partH('banner_top', bw);
     part('banner_top', bx, -8, bw);
-    text(this.w + '. ' + w.name, GW / 2 - 82, 76, {
-      size: 31, color: '#5b2a14', stroke: false, font: SERIF
+    text(this.w + '. ' + w.name, GW / 2 - 105, 112, {
+      size: 30, color: '#5b2a14', stroke: false, font: SERIF
     });
-    text('월드 ' + this.w + '  ·  ★ ' + worldStars(this.w) + ' / 30', GW / 2 + 126, 76, {
-      size: 15, color: '#6b4528', stroke: false
+    text('월드 ' + this.w + '  ·  ★ ' + worldStars(this.w) + ' / 30', GW / 2 + 125, 112, {
+      size: 17, color: '#6b4528', stroke: false
     });
 
     arrowDiamond(bx - 26, 68, -1, () => this.step(-1), { disabled: this.w <= 1 });
