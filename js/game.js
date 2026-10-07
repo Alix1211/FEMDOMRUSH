@@ -1,5 +1,6 @@
 /* FEMDOM RUSH — 화면·입력·그리기 */
 'use strict';
+const BUILD_ID = (typeof window !== 'undefined' && window.BUILD && window.BUILD !== '__BUILD__') ? window.BUILD : String(Date.now());
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const FONT = "'Noto Sans KR','Malgun Gothic','Apple SD Gothic Neo','Segoe UI',sans-serif";
@@ -10,7 +11,7 @@ const COL = { gold: '#f1c26b', gold2: '#b8802f', cream: '#fff0cf', dark: '#2a1a1
 const IMGS = {};
 function img(path) {
   let e = IMGS[path];
-  if (!e) { e = IMGS[path] = { im: new Image(), ok: false, err: false }; e.im.onload = () => { e.ok = true; }; e.im.onerror = () => { e.err = true; }; e.im.src = path; }
+  if (!e) { e = IMGS[path] = { im: new Image(), ok: false, err: false }; e.im.onload = () => { e.ok = true; }; e.im.onerror = () => { e.err = true; }; e.im.src = path + '?v=' + BUILD_ID; }
   return e.ok ? e.im : null;
 }
 const PART = n => img('assets/ui/parts/' + n + '.webp');
@@ -200,8 +201,8 @@ const Loading = {
   update(dt) {
     if (!this.started) {
       this.started = true;
-      fetch('assets/units/units.json').then(r => r.json()).then(j => { UMETA = j; });
-      fetch('assets/data/maps.json').then(r => r.json()).then(j => { MAPS = j; });
+      fetch('assets/units/units.json?v=' + BUILD_ID).then(r => r.json()).then(j => { UMETA = j; });
+      fetch('assets/data/maps.json?v=' + BUILD_ID).then(r => r.json()).then(j => { MAPS = j; });
       this.list = ESSENTIAL(); this.list.forEach(img);
     }
     this.done = this.list.filter(p => IMGS[p] && IMGS[p].ok).length;
