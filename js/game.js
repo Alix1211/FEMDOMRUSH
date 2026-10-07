@@ -494,51 +494,87 @@ const PrepUI = {
 };
 function drawPrep(p) {
   ctx.fillStyle = 'rgba(8,6,10,.62)'; ctx.fillRect(0, 0, GW, GH);
-  hit(0, 0, GW, GH, () => { });                                    // 바깥 클릭 방지
-  const px = 130, py = 38, pw = 1020, ph = 644, st = p.stage, w = WORLDS[p.world - 1];
-  panel(px, py, pw, ph, { r: 22 });
-  hit(px, py, pw, ph, () => { });
-  text('스테이지 ' + st.id, px + 36, py + 46, { size: 38, align: 'left', color: COL.gold, font: SERIF });
-  text(w.name + '  ·  ' + (st.boss ? '보스전' : st.mid ? '중간 보스' : '일반 전투'), px + 36, py + 88, { size: 18, align: 'left', weight: 600, color: '#d8c49a', stroke: false });
-  text('목표', px + 36, py + 128, { size: 16, align: 'left', color: COL.gold, stroke: false });
-  text(st.objective, px + 82, py + 128, { size: 18, align: 'left', weight: 600, stroke: false });
-  // 요약
-  const info = [['웨이브', st.waves.length], ['생명', st.lives], ['보상', '★ 최대 3']];
-  info.forEach((it, i) => { const x = px + 560 + i * 150; text(String(it[1]), x + 62, py + 52, { size: 30, font: SERIF, color: '#fff2c8' }); text(it[0], x + 62, py + 86, { size: 15, weight: 600, color: '#cbb892', stroke: false }); });
-  const bs = starsOf(p.world, st.no); drawStars(px + pw - 100, py + 130, bs, 26);
-  // 적 미리보기
-  text('출현하는 적', px + 36, py + 168, { size: 16, align: 'left', color: COL.gold, stroke: false });
+  hit(0, 0, GW, GH, () => { });
+  const frame = { w: GW * .91, h: GH * .99 };
+  frame.x = (GW - frame.w) / 2; frame.y = (GH - frame.h) / 2;
+  const inner = { x: frame.x + frame.w * .075, y: frame.y + frame.h * .245, w: frame.w * .85, h: frame.h * .625 };
+  const st = p.stage, world = WORLDS[p.world - 1];
+  const ink = '#4b2c20', muted = '#79563b';
+  const label = (str, x, y, o = {}) => text(str, x, y, { color: ink, stroke: false, ...o });
+  ctx.save();
+  rr(frame.x + frame.w * .035, frame.y + frame.h * .13, frame.w * .93, frame.h * .81, 24);
+  const paper = ctx.createLinearGradient(0, inner.y, 0, inner.y + inner.h);
+  paper.addColorStop(0, '#fff1d5'); paper.addColorStop(1, '#dcc198');
+  ctx.fillStyle = paper; ctx.fill();
+  const ornament = img('화려한 판타지 골드 프레임.png');
+  if (ornament) ctx.drawImage(ornament, frame.x, frame.y, frame.w, frame.h);
+  ctx.restore();
+  hit(frame.x, frame.y, frame.w, frame.h, () => { });
+  text('스테이지 ' + st.id, frame.x + frame.w / 2, frame.y + frame.h * .16, { size: 32, color: COL.cream, font: SERIF, align: 'center', base: 'middle' });
+  const section = (y, h) => {
+    rr(inner.x, y, inner.w, h, 10); ctx.fillStyle = 'rgba(255,249,231,.48)'; ctx.fill();
+    ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(150,104,48,.4)'; ctx.stroke();
+  };
+  const top = { x: inner.x, y: inner.y, w: inner.w, h: inner.h * .16 };
+  section(top.y, top.h);
+  label(world.name + '  ·  ' + (st.boss ? '보스전' : st.mid ? '중간 보스' : '일반 전투'), top.x + top.w * .02, top.y + top.h * .28, { size: 18, align: 'left' });
+  label('목표  ' + st.objective, top.x + top.w * .02, top.y + top.h * .72, { size: 16, align: 'left', weight: 600 });
+  [['웨이브', st.waves.length], ['생명', st.lives], ['보상', '★ 최대 3']].forEach((it, i) => {
+    const x = top.x + top.w * (.65 + i * .13);
+    label(String(it[1]), x, top.y + top.h * .3, { size: 24, font: SERIF });
+    label(it[0], x, top.y + top.h * .74, { size: 13, color: muted });
+  });
+  const enemies = { x: inner.x, y: inner.y + inner.h * .18, w: inner.w * .67, h: inner.h * .22 };
+  label('출현하는 적', enemies.x + enemies.w * .03, enemies.y + enemies.h * .1, { size: 15, align: 'left' });
   const seen = []; st.waves.forEach(wv => wv.forEach(g => { if (!seen.find(s => s.sprite === g.sprite)) seen.push(g); }));
   seen.slice(0, 7).forEach((g, i) => {
-    const x = px + 36 + i * 100, y = py + 180;
-    rr(x, y, 90, 104, 12); ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = g.type === 'boss' ? '#d9453b' : 'rgba(214,170,90,.6)'; ctx.stroke();
-    drawPortrait('enemies', g.sprite, x + 5, y + 5, 80, 74);
-    text(TYPE_LABEL[g.type], x + 45, y + 92, { size: 14, color: g.type === 'boss' ? '#ff9a8a' : COL.cream, lw: 3 });
+    const w = enemies.w * .115, h = enemies.h * .75, x = enemies.x + enemies.w * (.03 + i * .135), y = enemies.y + enemies.h * .24;
+    rr(x, y, w, h, 8); ctx.fillStyle = '#d8bd94'; ctx.fill(); ctx.lineWidth = 1.5; ctx.strokeStyle = g.type === 'boss' ? COL.red : '#b38a4d'; ctx.stroke();
+    drawPortrait('enemies', g.sprite, x + w * .06, y + h * .04, w * .88, h * .71);
+    label(TYPE_LABEL[g.type], x + w / 2, y + h * .87, { size: 12, color: g.type === 'boss' ? '#9b2727' : ink });
   });
-  // 덱
-  text('출격 덱 (' + p.deck.length + ' / 6)  —  카드를 눌러 빼거나 넣을 수 있습니다', px + 36, py + 310, { size: 16, align: 'left', color: COL.gold, stroke: false });
+  const record = { x: inner.x + inner.w * .72, y: enemies.y, w: inner.w * .26, h: enemies.h };
+  label('최고 기록', record.x + record.w / 2, record.y + record.h * .3, { size: 14, color: muted });
+  drawStars(record.x + record.w / 2, record.y + record.h * .66, starsOf(p.world, st.no), 24);
+  const deck = { x: inner.x, y: inner.y + inner.h * .425, w: inner.w * .66, h: inner.h * .265 };
+  label('출격 덱 (' + p.deck.length + ' / 6)  ·  카드를 눌러 편성', deck.x + deck.w * .03, deck.y, { size: 15, align: 'left' });
   for (let i = 0; i < 6; i++) {
-    const x = px + 36 + i * 96, y = py + 322, cw = 80, k = p.deck[i];
+    const cw = deck.w * .105, x = deck.x + deck.w * (.03 + i * .155), y = deck.y + deck.h * .13, k = p.deck[i];
     if (k) { const r = ROSTER.find(q => q.key === k); const h = drawCard(x, y, cw, r, { cost: CLASSES[r.cls].cost, label: r.label }); hit(x, y, cw, h, () => { p.deck.splice(i, 1); }); }
     else drawCard(x, y, cw, {}, { locked: true });
   }
-  // 대기 명단 (아군 23명)
-  text('아군 명단 (' + ROSTER.length + '명)', px + 36, py + 452, { size: 16, align: 'left', color: COL.gold, stroke: false });
-  const cw = 56;
+  const prepButton = (r, title, fn, disabled = false) => {
+    ctx.save();
+    const hv = hovered(r.x, r.y, r.w, r.h) && !disabled;
+    ctx.shadowColor = 'rgba(80,30,12,.35)'; ctx.shadowBlur = hv ? 14 : 6; ctx.shadowOffsetY = 3;
+    rr(r.x, r.y, r.w, r.h, 12);
+    const g = ctx.createLinearGradient(0, r.y, 0, r.y + r.h);
+    g.addColorStop(0, disabled ? '#8c8071' : hv ? '#db4840' : '#bc3430'); g.addColorStop(1, disabled ? '#62594e' : '#68151d');
+    ctx.fillStyle = g; ctx.fill(); ctx.shadowColor = 'transparent';
+    ctx.strokeStyle = COL.gold; ctx.lineWidth = 3; ctx.stroke();
+    rr(r.x + 5, r.y + 5, r.w - 10, r.h - 10, 8); ctx.lineWidth = 1; ctx.strokeStyle = '#e8ba69'; ctx.stroke();
+    text(title, r.x + r.w / 2, r.y + r.h / 2, { size: r.h * .43, align: 'center', base: 'middle', color: COL.cream, lw: 3 });
+    ctx.restore();
+    if (!disabled) hit(r.x, r.y, r.w, r.h, fn);
+  };
+  const actions = { x: inner.x + inner.w * .72, y: deck.y - deck.h * .12, w: inner.w * .26, h: deck.h };
+  prepButton({ x: actions.x, y: actions.y, w: actions.w, h: actions.h * .5 }, '출격 ▶', () => {
+    if (!p.deck.length) { toast('출격할 유닛을 선택하세요'); return; }
+    save.deck = p.deck.slice(); persist(); go(BattleScreen, { stage: st, deck: p.deck.slice() });
+  }, !p.deck.length);
+  prepButton({ x: actions.x, y: actions.y + actions.h * .6, w: actions.w, h: actions.h * .28 }, '취소', () => { Stage.prep = null; });
+  const roster = { x: inner.x, y: inner.y + inner.h * .72, w: inner.w, h: inner.h * .28 };
+  label('아군 명단 (' + ROSTER.length + '명)', roster.x + roster.w * .02, roster.y, { size: 15, align: 'left' });
   ROSTER.forEach((r, i) => {
-    const row = i < 12 ? 0 : 1, col = i < 12 ? i : i - 12, x = px + 36 + col * 78, y = py + 474 + row * 84, inDeck = p.deck.includes(r.key);
-    const h = drawCard(x, y, cw, r, { cost: CLASSES[r.cls].cost, dim: inDeck ? 0.55 : 0, lift: false });
+    const row = i < 12 ? 0 : 1, col = i < 12 ? i : i - 12;
+    const cw = roster.w * .044, x = roster.x + roster.w * (.02 + col * .082), y = roster.y + roster.h * (.12 + row * .46), inDeck = p.deck.includes(r.key);
+    const h = drawCard(x, y, cw, r, { cost: CLASSES[r.cls].cost, dim: inDeck ? .55 : 0, lift: false });
     hit(x, y, cw, h, () => {
       if (inDeck) p.deck.splice(p.deck.indexOf(r.key), 1);
       else if (p.deck.length < 6) p.deck.push(r.key);
       else toast('덱은 6명까지입니다');
     });
   });
-  button(px + 690, py + 428, 300, 48, '취소', () => { Stage.prep = null; }, { size: 20 });
-  button(px + 690, py + 330, 300, 84, '출격 ▶', () => {
-    if (!p.deck.length) { toast('출격할 유닛을 선택하세요'); return; }
-    save.deck = p.deck.slice(); persist(); go(BattleScreen, { stage: st, deck: p.deck.slice() });
-  }, { kind: 'primary', size: 34, disabled: !p.deck.length });
 }
 
 /* ═══════════════ 모달 (설정 / 도감) ═══════════════ */
