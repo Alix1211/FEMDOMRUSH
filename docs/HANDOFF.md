@@ -11,3 +11,9 @@
 2. index.html / styles.css 를 새 구조로 교체 (canvas#gameCanvas + js/data.js, battle.js, game.js 순서)
 3. Playwright 로 실제 화면 확인 → 어긋난 곳 수정
 4. 임시 항목 확정 필요: 아군 이름/클래스(외형 기준 임시), 적 유형 배정, 스탯 스케일, 데미지 최소 비율
+
+## 추가 반영 (최신)
+- 첫 화면: assets/ui/title_key.webp(대치 일러스트)가 배경. "시작"을 누르면 약 1.3초 교차 페이드로 월드맵으로 전환 (js/game.js의 World, fk/logoK).
+- 배포 주소: https://alix1211.github.io/FEMDOMRUSH/ (저장소 이름이 대문자 FEMDOMRUSH입니다. 소문자 주소는 404).
+- 캐시 방지: pages.yml이 배포할 때 index.html의 __BUILD__를 커밋 해시로 바꿔 스크립트·이미지·JSON에 ?v= 버전을 붙입니다. index.html의 __BUILD__ 표기는 지우지 마세요.
+- 전투 화면은 여전히 미구현 (BattleScreen 임시 안내만 있음). 시안 3번 기준, 만들기 전에 케인과 배치 상의.
