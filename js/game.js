@@ -411,10 +411,10 @@ const Stage = {
 
     const bw = 520, bx = GW / 2 - bw / 2, bh = partH('banner_top', bw);
     part('banner_top', bx, -8, bw);
-    text(this.w + '. ' + w.name, GW / 2 - 150, 130, {
-      size: 28, color: '#5b2a14', stroke: false, font: SERIF
+    text(this.w + '. ' + w.name, GW / 2 - 135, 100, {
+      size: 29, color: '#5b2a14', stroke: false, font: SERIF
     });
-    text('월드 ' + this.w + '  ·  ★ ' + worldStars(this.w) + ' / 30', GW / 2 + 135, 130, {
+    text('월드 ' + this.w + '  ·  ★ ' + worldStars(this.w) + ' / 30', GW / 2 + 125, 100, {
       size: 16, color: '#6b4528', stroke: false
     });
 
