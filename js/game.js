@@ -625,18 +625,19 @@ function drawModal() {
     const x = 70, y = 28, w = 1140, h = 664; panel(x, y, w, h); hit(x, y, w, h, () => { });
     text('도감', x + 60, y + 40, { size: 32, color: COL.gold, font: SERIF });
     button(x + 140, y + 14, 120, 44, '아군 ' + ROSTER.length, () => { modal.tab = 'units'; modal.sel = 0; }, { size: 18, kind: modal.tab === 'units' ? 'primary' : 'dark' });
-    button(x + 270, y + 14, 120, 44, '적 34', () => { modal.tab = 'enemies'; modal.sel = 0; }, { size: 18, kind: modal.tab === 'enemies' ? 'primary' : 'dark' });
+    button(x + 270, y + 14, 120, 44, '적 ' + Object.keys(UMETA.enemies).length, () => { modal.tab = 'enemies'; modal.sel = 0; }, { size: 18, kind: modal.tab === 'enemies' ? 'primary' : 'dark' });
     button(x + w - 130, y + 14, 100, 44, '닫기', () => { modal = null; }, { size: 18 });
     const keys = modal.tab === 'units' ? ROSTER.map(r => r.key) : Object.keys(UMETA.enemies).sort();
     const cols = 12, cw = 72, ch = 78;
     keys.forEach((k, i) => {
       const cx = x + 30 + (i % cols) * 90, cy = y + 76 + Math.floor(i / cols) * 88, on = modal.sel === i;
       rr(cx, cy, cw + 8, ch + 4, 10); ctx.fillStyle = on ? 'rgba(255,214,120,.28)' : 'rgba(0,0,0,.3)'; ctx.fill(); ctx.lineWidth = on ? 3 : 1.5; ctx.strokeStyle = on ? COL.gold : 'rgba(214,170,90,.4)'; ctx.stroke();
-      drawPortrait(modal.tab, k, cx + 4, cy + 4, cw, ch - 6); text(modal.tab === 'units' ? (ALLY_NAMES[k] || k.slice(1)) : (MALE_HEROES[k] || k.slice(1)), cx + 4 + cw / 2, cy + ch - 8, { size: 14, lw: 3 });
+      drawPortrait(modal.tab, k, cx + 4, cy + 4, cw, ch - 6); text(modal.tab === 'units' ? (ALLY_NAMES[k] || k.slice(1)) : (MALE_HEROES[k] || BOSS_NAMES[k] || k.slice(1)), cx + 4 + cw / 2, cy + ch - 8, { size: 14, lw: 3 });
       hit(cx, cy, cw + 8, ch + 4, () => { modal.sel = i; });
     });
     const sk = keys[modal.sel], by = y + 76 + Math.ceil(keys.length / cols) * 88 + 6;
     if (sk) {
+      if (modal.tab === 'enemies' && BOSS_NAMES[sk]) text(BOSS_NAMES[sk] + '  ·  보스', x + w / 2, by + 300, { size: 20, color: COL.gold, stroke: false });
       if (modal.tab === 'enemies' && MALE_HEROES[sk]) text(MALE_HEROES[sk] + '  ·  정화 후 합류하는 남성 히어로', x + w / 2, by + 300, { size: 20, color: COL.gold, stroke: false });
       const m = UMETA[modal.tab][sk]; let ox = x + 60;
       for (let d = 0; d < 4; d++) { const dw = m.w[d] * 250 / m.h; drawSprite(modal.tab, sk, d, ox + dw / 2, by + 250, 250); ox += dw + 20; }
