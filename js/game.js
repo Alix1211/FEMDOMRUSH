@@ -404,14 +404,14 @@ const Stage = {
 
     // 상단 UI — 시안처럼 크게 하나의 제목판으로 정리
     part('logo', 16, 8, 216);
-    button(18, 116, 148, 50, '← 월드맵', () => go(World, { mode: 'map' }), { size: 19 });
+    worldMapBackButton(18, 112, '월드맵', () => go(World, { mode: 'map' }));
 
     const bw = 520, bx = GW / 2 - bw / 2, bh = partH('banner_top', bw);
     part('banner_top', bx, -8, bw);
-    text(this.w + '. ' + w.name, GW / 2, 48, {
+    text(this.w + '. ' + w.name, GW / 2, 66, {
       size: 34, color: '#5b2a14', stroke: 'rgba(255,244,215,.96)', lw: 5, font: SERIF
     });
-    text('월드 ' + this.w + '  ·  ★ ' + worldStars(this.w) + ' / 30', GW / 2, 83, {
+    text('월드 ' + this.w + '  ·  ★ ' + worldStars(this.w) + ' / 30', GW / 2, 104, {
       size: 16, color: '#6b4528', stroke: false
     });
 
