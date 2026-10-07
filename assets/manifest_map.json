@@ -1,0 +1,213 @@
+{
+ "worlds": {
+  "w1_harbor": "부두",
+  "w2_forest": "숲",
+  "w3_desert": "사막",
+  "w4_meadow": "초원",
+  "w5_village": "초원2(마을)",
+  "w6_castle": "왕성",
+  "w7_demon": "마계"
+ },
+ "files": [
+  {
+   "file": "assets/worldmap/sky.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_16_52-1.png"
+  },
+  {
+   "file": "assets/worldmap/island_w1_harbor.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_16_55-2.png"
+  },
+  {
+   "file": "assets/worldmap/island_w2_forest.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_16_57-3.png"
+  },
+  {
+   "file": "assets/worldmap/island_w3_desert.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_16_59-4.png"
+  },
+  {
+   "file": "assets/worldmap/island_w5_village.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_17_00-5.png"
+  },
+  {
+   "file": "assets/worldmap/island_w4_meadow.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_17_02-6.png"
+  },
+  {
+   "file": "assets/worldmap/island_w6_castle.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_17_04-7.png"
+  },
+  {
+   "file": "assets/worldmap/island_w7_demon.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_17_06-8.png"
+  },
+  {
+   "file": "assets/stage/stage_w1_harbor.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_16_09-1.png"
+  },
+  {
+   "file": "assets/stage/stage_w2_forest.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_16_22-2.png"
+  },
+  {
+   "file": "assets/stage/stage_w3_desert.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_16_25-3.png"
+  },
+  {
+   "file": "assets/stage/stage_w5_village.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_16_26-4.png"
+  },
+  {
+   "file": "assets/stage/stage_w4_meadow.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_16_28-5.png"
+  },
+  {
+   "file": "assets/stage/stage_w6_castle.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_16_30-6.png"
+  },
+  {
+   "file": "assets/stage/stage_w7_demon.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_16_32-7.png"
+  },
+  {
+   "file": "assets/battle/battle_w1_harbor_1.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_17_19-1.png"
+  },
+  {
+   "file": "assets/battle/battle_w1_harbor_2.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_17_23-2.png"
+  },
+  {
+   "file": "assets/battle/battle_w1_harbor_3.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_17_24-3.png"
+  },
+  {
+   "file": "assets/battle/battle_w1_harbor_4.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_17_26-4.png"
+  },
+  {
+   "file": "assets/battle/battle_w1_harbor_5.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_17_28-5.png"
+  },
+  {
+   "file": "assets/battle/battle_w2_forest_1.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_17_30-6.png"
+  },
+  {
+   "file": "assets/battle/battle_w2_forest_2.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_17_31-7.png"
+  },
+  {
+   "file": "assets/battle/battle_w2_forest_3.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_17_33-8.png"
+  },
+  {
+   "file": "assets/battle/battle_w2_forest_4.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_17_34-9.png"
+  },
+  {
+   "file": "assets/battle/battle_w2_forest_5.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_17_36-10.png"
+  },
+  {
+   "file": "assets/battle/battle_w3_desert_1.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_17_46-1.png"
+  },
+  {
+   "file": "assets/battle/battle_w3_desert_2.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_17_48-2.png"
+  },
+  {
+   "file": "assets/battle/battle_w3_desert_3.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_17_50-3.png"
+  },
+  {
+   "file": "assets/battle/battle_w3_desert_4.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_17_52-4.png"
+  },
+  {
+   "file": "assets/battle/battle_w3_desert_5.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_17_53-5.png"
+  },
+  {
+   "file": "assets/battle/battle_w4_meadow_1.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_17_55-6.png"
+  },
+  {
+   "file": "assets/battle/battle_w4_meadow_2.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_17_56-7.png"
+  },
+  {
+   "file": "assets/battle/battle_w4_meadow_3.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_17_58-8.png"
+  },
+  {
+   "file": "assets/battle/battle_w4_meadow_4.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_18_00-9.png"
+  },
+  {
+   "file": "assets/battle/battle_w4_meadow_5.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_18_01-10.png"
+  },
+  {
+   "file": "assets/battle/battle_w5_village_1.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_18_12-1.png"
+  },
+  {
+   "file": "assets/battle/battle_w5_village_2.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_18_14-2.png"
+  },
+  {
+   "file": "assets/battle/battle_w5_village_3.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_18_16-3.png"
+  },
+  {
+   "file": "assets/battle/battle_w5_village_4.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_18_18-4.png"
+  },
+  {
+   "file": "assets/battle/battle_w5_village_5.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_18_20-5.png"
+  },
+  {
+   "file": "assets/battle/battle_w6_castle_1.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_18_22-6.png"
+  },
+  {
+   "file": "assets/battle/battle_w6_castle_2.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_18_23-7.png"
+  },
+  {
+   "file": "assets/battle/battle_w6_castle_3.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_18_25-8.png"
+  },
+  {
+   "file": "assets/battle/battle_w6_castle_4.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_18_27-9.png"
+  },
+  {
+   "file": "assets/battle/battle_w6_castle_5.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_18_29-10.png"
+  },
+  {
+   "file": "assets/battle/battle_w7_demon_1.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_18_37-1.png"
+  },
+  {
+   "file": "assets/battle/battle_w7_demon_2.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_18_40-2.png"
+  },
+  {
+   "file": "assets/battle/battle_w7_demon_3.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_18_41-3.png"
+  },
+  {
+   "file": "assets/battle/battle_w7_demon_4.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_18_43-4.png"
+  },
+  {
+   "file": "assets/battle/battle_w7_demon_5.webp",
+   "original": "ChatGPT 이미지 2026년 10월 6일 오전 10_18_45-5.png"
+  }
+ ]
+}
