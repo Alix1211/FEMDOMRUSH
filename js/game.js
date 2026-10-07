@@ -219,23 +219,24 @@ const Loading = {
 
 /* ═══════════════ 타이틀 + 월드맵 ═══════════════ */
 const World = {
-  enter(a) { this.mode = a.mode; this.sel = -1; this.t = 0; this.fk = this.mode === 'title' ? 0 : 1; this.logoK = this.fk; },
+  enter(a) { this.mode = a.mode; this.sel = -1; this.hoverId = 0; this.t = 0; this.fk = this.mode === 'title' ? 0 : 1; this.logoK = this.fk; },
   update(dt) {
     this.t += dt;
-    const tg = this.mode === 'title' ? 0 : 1, step = dt / 1.3;   // 약 1.3초에 걸쳐 스르륵 교차
+    const tg = this.mode === 'title' ? 0 : 1, step = dt / 1.3;
     this.fk += Math.max(-step, Math.min(step, tg - this.fk));
-    this.logoK = this.fk * this.fk * (3 - 2 * this.fk);          // 부드러운 가감속
+    this.logoK = this.fk * this.fk * (3 - 2 * this.fk);
   },
-  islandRect(w) {
+  islandRect(w, hoverScale = true) {
     const sl = w.slot, bob = w.bob, im = img('assets/worldmap/island_' + w.id + '.webp'); if (!im) return null;
-    const dy = Math.sin(this.t * 2 * Math.PI / bob[1] + bob[2]) * bob[0], dx = Math.cos(this.t * 2 * Math.PI / (bob[1] * 1.7) + bob[2]) * 2.5;
-    const hv = this.mode === 'map' && (this.hoverId === w.n || this.sel === w.n - 1), k = hv ? 1.06 : 1;
+    const dy = Math.sin(this.t * 2 * Math.PI / bob[1] + bob[2]) * bob[0];
+    const dx = Math.cos(this.t * 2 * Math.PI / (bob[1] * 1.7) + bob[2]) * 2.5;
+    const hv = hoverScale && this.mode === 'map' && (this.hoverId === w.n || this.sel === w.n - 1), k = hv ? 1.045 : 1;
     const ww = sl.w * k, hh = ww * im.height / im.width;
     return { im, x: sl.cx - ww / 2 + dx, y: sl.cy - hh / 2 + dy, w: ww, h: hh, dy };
   },
   draw() {
     const t = this.t, K = this.logoK, showMap = K > 0.02;
-    // 타이틀 일러스트 (대치 장면) — 천천히 숨 쉬듯 움직임
+
     if (K < 0.98) {
       cover(img('assets/ui/title_key.webp'), 1, 1.05 + Math.sin(t * 0.35) * 0.012, Math.sin(t * 0.21) * 12, Math.cos(t * 0.17) * 6);
       const bg = ctx.createLinearGradient(0, GH - 190, 0, GH); bg.addColorStop(0, 'rgba(10,6,8,0)'); bg.addColorStop(1, 'rgba(10,6,8,.62)');
@@ -243,59 +244,91 @@ const World = {
       const vg = ctx.createRadialGradient(GW / 2, GH / 2, GH * 0.45, GW / 2, GH / 2, GW * 0.7); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.28)');
       ctx.fillStyle = vg; ctx.fillRect(0, 0, GW, GH);
     }
-    if (showMap) { cover(img('assets/worldmap/sky.webp'), K, 1.05, Math.sin(t * 0.07) * 14, Math.cos(t * 0.05) * 5); ctx.globalAlpha = K; }
-    // 구름 느낌의 옅은 빛
-    if (showMap) { const gl = ctx.createLinearGradient(0, 0, 0, GH); gl.addColorStop(0, 'rgba(255,255,255,.06)'); gl.addColorStop(1, 'rgba(20,50,110,.12)'); ctx.fillStyle = gl; ctx.fillRect(0, 0, GW, GH); }
-    // 섬 사이 점선 길
-    ctx.save(); ctx.fillStyle = 'rgba(255,244,200,.9)';
-    for (let i = 0; showMap && i < 6; i++) {
-      const a = WORLDS[i].slot, b = WORLDS[i + 1].slot;
-      for (let k = 1; k < 9; k++) { const u = k / 9; const x = a.cx + (b.cx - a.cx) * u, y = a.cy + (b.cy - a.cy) * u - Math.sin(u * Math.PI) * 30; ctx.beginPath(); ctx.arc(x, y + 60, 2.6 + Math.sin(t * 3 + k + i) * 0.7, 0, 7); ctx.fill(); }
+    if (showMap) {
+      cover(img('assets/worldmap/sky.webp'), K, 1.05, Math.sin(t * 0.07) * 14, Math.cos(t * 0.05) * 5);
+      ctx.globalAlpha = K;
+      const gl = ctx.createLinearGradient(0, 0, 0, GH); gl.addColorStop(0, 'rgba(255,255,255,.04)'); gl.addColorStop(1, 'rgba(20,50,110,.08)');
+      ctx.fillStyle = gl; ctx.fillRect(0, 0, GW, GH);
     }
-    ctx.restore();
-    // 섬
-    this.hoverId = 0; const order = showMap ? WORLDS.slice().sort((a, b) => a.slot.cy - b.slot.cy) : [];
+
+    // 현재 프레임의 롤오버 섬을 먼저 판정해야 아웃글로가 즉시 보인다.
+    this.hoverId = 0;
+    if (showMap && this.mode === 'map' && !ptr.touchLike) {
+      for (const w of WORLDS) {
+        const r = this.islandRect(w, false); if (!r) continue;
+        const hx = r.x + r.w * 0.04, hy = r.y + r.h * 0.12, hw = r.w * 0.92, hh = r.h * 0.80;
+        if (hovered(hx, hy, hw, hh)) this.hoverId = w.n;
+      }
+    }
+
+    // 섬 사이의 은은한 빛길
+    if (showMap) {
+      ctx.save(); ctx.lineCap = 'round'; ctx.globalAlpha = 0.45;
+      for (let i = 0; i < 6; i++) {
+        const a = WORLDS[i].slot, b = WORLDS[i + 1].slot;
+        const g = ctx.createLinearGradient(a.cx, a.cy, b.cx, b.cy);
+        g.addColorStop(0, 'rgba(255,238,145,0)'); g.addColorStop(.25, 'rgba(255,226,105,.78)'); g.addColorStop(.75, 'rgba(255,226,105,.78)'); g.addColorStop(1, 'rgba(255,238,145,0)');
+        ctx.strokeStyle = g; ctx.lineWidth = 4; ctx.shadowColor = 'rgba(255,218,94,.6)'; ctx.shadowBlur = 12;
+        ctx.beginPath(); ctx.moveTo(a.cx, a.cy + 45); ctx.quadraticCurveTo((a.cx + b.cx) / 2, (a.cy + b.cy) / 2 + 80, b.cx, b.cy + 45); ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    const order = showMap ? WORLDS.slice().sort((a, b) => a.slot.cy - b.slot.cy) : [];
     for (const w of order) {
       const r = this.islandRect(w); if (!r) continue;
-      const open = worldOpen(w.n);
+      const open = worldOpen(w.n), active = this.mode === 'map' && (this.hoverId === w.n || this.sel === w.n - 1);
+
       ctx.save();
-      ctx.shadowColor = 'rgba(40,70,130,.35)'; ctx.shadowBlur = 24; ctx.shadowOffsetY = 18;
-      if (this.mode === 'map' && (this.hoverId === w.n || this.sel === w.n - 1) && open) { ctx.shadowColor = 'rgba(255,230,140,.95)'; ctx.shadowBlur = 36; ctx.shadowOffsetY = 0; }
-      if (!open && this.mode === 'map') ctx.filter = 'grayscale(.75) brightness(.75)';
-      ctx.drawImage(r.im, r.x, r.y, r.w, r.h); ctx.restore();
-      // 번호표
-      const px = w.slot.cx, py = w.slot.cy + r.h * 0.5 + r.dy * 0.6 - 18;
-      const nm = w.name, tw = 32 + nm.length * 22, pw = tw + 46;
-      ctx.save(); rr(px - pw / 2, py - 17, pw, 34, 17); ctx.fillStyle = 'rgba(38,22,17,.92)'; ctx.fill(); ctx.lineWidth = 2.5; ctx.strokeStyle = COL.gold2; ctx.stroke();
-      ctx.beginPath(); ctx.arc(px - pw / 2 + 17, py, 15, 0, 7); ctx.fillStyle = COL.red; ctx.fill(); ctx.lineWidth = 2.5; ctx.strokeStyle = COL.gold; ctx.stroke(); ctx.restore();
-      text(String(w.n), px - pw / 2 + 17, py + 1, { size: 18, lw: 3 }); text(nm, px + 10, py + 1, { size: 19, lw: 3 });
+      if (!open && this.mode === 'map') ctx.filter = 'grayscale(.72) brightness(.72)';
+      if (active) {
+        ctx.shadowColor = open ? 'rgba(255,221,90,.98)' : 'rgba(190,190,190,.72)';
+        ctx.shadowBlur = 30; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0;
+        // 같은 실루엣을 한 번 더 비춰 섬 외곽이 또렷하게 빛나게 한다.
+        ctx.globalAlpha = .92;
+        ctx.drawImage(r.im, r.x, r.y, r.w, r.h);
+        ctx.globalAlpha = 1;
+        ctx.shadowBlur = 18;
+      } else {
+        ctx.shadowColor = 'rgba(30,55,110,.28)'; ctx.shadowBlur = 18; ctx.shadowOffsetY = 14;
+      }
+      ctx.drawImage(r.im, r.x, r.y, r.w, r.h);
+      ctx.restore();
+
       if (this.mode === 'map') {
-        const hx = r.x + r.w * 0.04, hy = r.y + r.h * 0.12, hw = r.w * 0.92, hh = r.h * 0.8;
+        const hx = r.x + r.w * 0.04, hy = r.y + r.h * 0.12, hw = r.w * 0.92, hh = r.h * 0.80;
         hit(hx, hy, hw, hh, () => {
           if (!open) { toast('이전 월드를 먼저 클리어하세요'); this.sel = w.n - 1; return; }
           if (ptr.touchLike && this.sel !== w.n - 1) { this.sel = w.n - 1; return; }
           go(Stage, { world: w.n });
         });
-        if (hovered(hx, hy, hw, hh)) this.hoverId = w.n;
       }
     }
     ctx.globalAlpha = 1;
-    // 호버/선택 라벨
+
+    // 롤오버/터치 선택 때만 장식 패널 표시
     if (this.mode === 'map') {
       const id = this.hoverId || (this.sel >= 0 ? this.sel + 1 : 0);
       if (id) {
         const w = WORLDS[id - 1], r = this.islandRect(w), open = worldOpen(id);
-        const lw = 330, lh = 108; let lx = w.slot.cx - lw / 2, ly = r.y - 20; lx = Math.max(14, Math.min(GW - lw - 14, lx)); if (ly < 14) ly = r.y + r.h * 0.45;
-        panel(lx, ly, lw, lh, { r: 16 });
-        text(id + '. ' + w.name, lx + lw / 2, ly + 30, { size: 30, color: COL.gold });
-        text(open ? '스테이지 ' + id + '-1 ~ ' + id + '-10' : '잠김 · 이전 월드를 클리어하세요', lx + lw / 2, ly + 62, { size: 18, weight: 600 });
-        if (open) text('★ ' + worldStars(id) + ' / 30', lx + lw / 2, ly + 88, { size: 16, color: '#ffd978', stroke: false });
+        const pw = 248, ph = Math.max(48, partH('banner_bottom', pw));
+        let px = w.slot.cx - pw / 2, py = r.y + r.h * .74;
+        px = Math.max(16, Math.min(GW - pw - 16, px));
+        py = Math.max(92, Math.min(GH - ph - 16, py));
+        ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = 14; ctx.shadowOffsetY = 5;
+        part('banner_bottom', px, py, pw);
+        ctx.restore();
+        text('Stage ' + id + '  ' + w.name + (open ? '' : '  · 잠김'), px + pw / 2, py + ph * .47, {
+          size: 18, color: '#4c2417', stroke: 'rgba(255,246,220,.92)', lw: 3, font: SERIF
+        });
       }
     }
+
     // 로고 / 버튼
-    const k = this.logoK, lw = 500 - 210 * k, lx = GW / 2 - lw / 2 - (GW / 2 - lw / 2 - 18) * k, ly = 6 + 4 * k;
-    part('logo', lx, ly, lw);
+    const k = this.logoK;
     if (this.mode === 'title') {
+      const lw = 500 - 210 * k, lx = GW / 2 - lw / 2 - (GW / 2 - lw / 2 - 18) * k, ly = 6 + 4 * k;
+      part('logo', lx, ly, lw);
       const by = 616, a = 1 - k;
       ctx.globalAlpha = a;
       button(318, by + 8, 170, 62, '도감', () => this.openCollection(), { size: 24 });
@@ -305,10 +338,9 @@ const World = {
       ctx.globalAlpha = 1;
     } else {
       ctx.globalAlpha = k;
-      const hw = 360, hx = GW / 2 - hw / 2 + 120;
-      text('모험할 섬을 선택하세요', hx + hw / 2 - 120, 40, { size: 26, color: COL.gold });
-      button(22, 640, 150, 54, '← 타이틀', () => { this.mode = 'title'; }, { size: 20 });
-      button(GW - 172, 640, 150, 54, '전체화면', toggleFullscreen, { size: 20 });
+      part('logo', 18, 8, 292);
+      button(18, 650, 132, 48, '← 타이틀', () => { this.mode = 'title'; }, { size: 18 });
+      button(GW - 150, 650, 132, 48, '전체화면', toggleFullscreen, { size: 18 });
       ctx.globalAlpha = 1;
     }
     drawModal();
@@ -325,54 +357,107 @@ const Stage = {
   draw() {
     const w = WORLDS[this.w - 1], nodes = NODES['w' + this.w], t = this.t;
     cover(img('assets/stage/stage_' + w.id + '.webp'));
-    ctx.fillStyle = 'rgba(0,0,0,.08)'; ctx.fillRect(0, 0, GW, GH);
-    // 길
-    ctx.save(); ctx.lineCap = 'round';
+
+    // 위쪽 UI가 배경에 묻히지 않게 아주 옅은 그라데이션만 추가
+    const shade = ctx.createLinearGradient(0, 0, 0, 170);
+    shade.addColorStop(0, 'rgba(12,18,32,.22)'); shade.addColorStop(1, 'rgba(12,18,32,0)');
+    ctx.fillStyle = shade; ctx.fillRect(0, 0, GW, 170);
+
+    // 점광원으로 이어지는 스테이지 길
+    ctx.save();
     for (let i = 0; i < 9; i++) {
       const a = nodes[i], b = nodes[i + 1], done = starsOf(this.w, i + 1) > 0;
-      ctx.setLineDash(done ? [] : [10, 12]); ctx.lineWidth = done ? 6 : 5;
-      ctx.strokeStyle = 'rgba(40,20,10,.55)'; ctx.beginPath(); ctx.moveTo(a[0], a[1] + 2); ctx.lineTo(b[0], b[1] + 2); ctx.stroke();
-      ctx.strokeStyle = done ? '#ffd978' : 'rgba(255,248,226,.95)'; ctx.lineWidth = done ? 4 : 3.5; ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+      const dots = 14;
+      for (let d = 0; d <= dots; d++) {
+        const u = d / dots, x = a[0] + (b[0] - a[0]) * u, y = a[1] + (b[1] - a[1]) * u;
+        const pulse = .86 + Math.sin(t * 3.2 + d * .7 + i) * .14;
+        ctx.beginPath(); ctx.arc(x, y, (done ? 3.3 : 2.7) * pulse, 0, Math.PI * 2);
+        ctx.fillStyle = done ? 'rgba(255,210,72,.95)' : 'rgba(255,246,214,.92)';
+        ctx.shadowColor = done ? 'rgba(255,190,40,.95)' : 'rgba(255,235,180,.78)';
+        ctx.shadowBlur = done ? 12 : 8; ctx.fill();
+      }
     }
     ctx.restore();
+
     // 노드
     for (let i = 0; i < 10; i++) this.drawNode(this.w, i + 1, nodes[i], t);
-    // 상단
-    const bw = 400, bh = partH('banner_top', bw);
-    part('banner_top', GW / 2 - bw / 2, -6, bw);
-    text(this.w + '. ' + w.name, GW / 2, bh * 0.43, { size: 32, color: '#5b2a14', stroke: 'rgba(255,238,200,.9)', lw: 5, font: SERIF });
-    text('월드 ' + this.w + ' / 7  ·  ★ ' + worldStars(this.w) + ' / 30', GW / 2, bh * 0.43 + 34, { size: 15, color: '#6b4a2a', stroke: false });
-    arrowDiamond(GW / 2 - bw / 2 - 28, 70, -1, () => this.step(-1), { disabled: this.w <= 1 });
-    arrowDiamond(GW / 2 + bw / 2 + 28, 70, 1, () => this.step(1), { disabled: this.w >= 7 });
-    button(22, 22, 150, 54, '← 월드맵', () => go(World, { mode: 'map' }), { size: 20 });
-    button(GW - 172, 22, 150, 54, '전체화면', toggleFullscreen, { size: 20 });
+
+    // 상단 UI — 시안처럼 크게 하나의 제목판으로 정리
+    part('logo', 16, 8, 216);
+    button(18, 116, 148, 50, '← 월드맵', () => go(World, { mode: 'map' }), { size: 19 });
+
+    const bw = 520, bx = GW / 2 - bw / 2, bh = partH('banner_top', bw);
+    part('banner_top', bx, -8, bw);
+    text(this.w + '. ' + w.name, GW / 2, 48, {
+      size: 34, color: '#5b2a14', stroke: 'rgba(255,244,215,.96)', lw: 5, font: SERIF
+    });
+    text('월드 ' + this.w + '  ·  ★ ' + worldStars(this.w) + ' / 30', GW / 2, 83, {
+      size: 16, color: '#6b4528', stroke: false
+    });
+
+    arrowDiamond(bx - 26, 68, -1, () => this.step(-1), { disabled: this.w <= 1 });
+    arrowDiamond(bx + bw + 26, 68, 1, () => this.step(1), { disabled: this.w >= 7 });
+    button(GW - 164, 20, 146, 50, '전체화면', toggleFullscreen, { size: 18 });
+
     if (this.prep) drawPrep(this.prep);
     drawModal();
   },
   step(d) { const n = this.w + d; if (n < 1 || n > 7) return; go(Stage, { world: n }); },
   drawNode(wn, s, p, t) {
     const open = stageOpen(wn, s), stars = starsOf(wn, s), boss = s === 10, cur = open && stars === 0;
-    const r = boss ? 36 : 28, x = p[0], y = p[1];
-    if (cur) { const pr = (Math.sin(t * 4) + 1) / 2; ctx.save(); ctx.beginPath(); ctx.arc(x, y, r + 8 + pr * 8, 0, 7); ctx.fillStyle = 'rgba(255,224,120,' + (0.28 - pr * 0.18) + ')'; ctx.fill(); ctx.restore(); }
-    ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.55)'; ctx.shadowBlur = 10; ctx.shadowOffsetY = 4;
-    ctx.beginPath(); ctx.arc(x, y, r, 0, 7);
-    const g = ctx.createRadialGradient(x - 6, y - 8, 4, x, y, r);
-    if (!open) { g.addColorStop(0, '#8a8480'); g.addColorStop(1, '#3c3835'); }
-    else if (boss) { g.addColorStop(0, '#d9352e'); g.addColorStop(1, '#5e0f12'); }
-    else { g.addColorStop(0, '#6a4033'); g.addColorStop(1, '#2d1b16'); }
-    ctx.fillStyle = g; ctx.fill(); ctx.shadowColor = 'transparent';
-    ctx.lineWidth = 4; ctx.strokeStyle = !open ? '#9a928c' : stars ? '#ffe27a' : COL.gold2; ctx.stroke();
-    ctx.beginPath(); ctx.arc(x, y, r - 5, 0, 7); ctx.lineWidth = 1.2; ctx.strokeStyle = 'rgba(255,225,160,.5)'; ctx.stroke(); ctx.restore();
-    if (!open) drawLock(x, y - 1, 1.2);
-    else if (boss) drawSkull(x, y - 1, 1.5);
-    else text(String(s), x, y + 1, { size: 24, font: SERIF, lw: 4 });
+    const baseR = cur ? 36 : boss ? 34 : 30, x = p[0], y = p[1];
+    const hv = hovered(x - baseR - 8, y - baseR - 8, (baseR + 8) * 2, baseR * 2 + 42);
+    const scale = hv && open ? 1.08 : 1, r = baseR * scale;
+
+    if (cur) {
+      const pr = (Math.sin(t * 4) + 1) / 2;
+      ctx.save();
+      ctx.beginPath(); ctx.arc(x, y, r + 10 + pr * 7, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,205,70,' + (0.20 + (1 - pr) * .13) + ')';
+      ctx.shadowColor = 'rgba(255,194,45,.9)'; ctx.shadowBlur = 22; ctx.fill();
+      ctx.restore();
+    }
+
+    ctx.save();
+    ctx.shadowColor = hv && open ? 'rgba(255,215,80,.95)' : 'rgba(0,0,0,.55)';
+    ctx.shadowBlur = hv && open ? 20 : 10; ctx.shadowOffsetY = hv && open ? 0 : 4;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
+    const g = ctx.createRadialGradient(x - r * .24, y - r * .30, 4, x, y, r);
+    if (!open) { g.addColorStop(0, '#66514a'); g.addColorStop(1, '#251b19'); }
+    else if (cur) { g.addColorStop(0, '#ef4b42'); g.addColorStop(.55, '#ad2028'); g.addColorStop(1, '#5b1016'); }
+    else if (boss) { g.addColorStop(0, '#dd3c34'); g.addColorStop(1, '#651017'); }
+    else { g.addColorStop(0, '#ba3430'); g.addColorStop(1, '#54151a'); }
+    ctx.fillStyle = g; ctx.fill();
+    ctx.shadowColor = 'transparent';
+
+    ctx.lineWidth = 5; ctx.strokeStyle = !open ? '#8c7b67' : '#f4c45d'; ctx.stroke();
+    ctx.beginPath(); ctx.arc(x, y, r - 6, 0, Math.PI * 2);
+    ctx.lineWidth = 1.5; ctx.strokeStyle = open ? 'rgba(255,239,184,.74)' : 'rgba(210,198,180,.35)'; ctx.stroke();
+
+    // 위쪽 작은 루비 장식
+    ctx.translate(x, y - r + 1); ctx.rotate(Math.PI / 4);
+    rr(-5, -5, 10, 10, 2); ctx.fillStyle = open ? '#e52333' : '#75645c'; ctx.fill();
+    ctx.lineWidth = 1.5; ctx.strokeStyle = open ? '#ffd36a' : '#9a8b7d'; ctx.stroke();
+    ctx.restore();
+
+    if (!open) drawLock(x, y - 1, 1.25, '#dfd5c9');
+    else if (boss) drawSkull(x, y - 1, 1.45);
+    else text(String(s), x, y + 1, { size: cur ? 28 : 24, font: SERIF, lw: 4 });
+
     // 번호표
-    const lab = wn + '-' + s, lw2 = 52;
-    ctx.save(); rr(x - lw2 / 2, y + r + 3, lw2, 22, 8); ctx.fillStyle = open ? 'rgba(130,24,26,.95)' : 'rgba(70,66,64,.95)'; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = open ? COL.gold : '#8b837d'; ctx.stroke(); ctx.restore();
-    text(lab, x, y + r + 14.5, { size: 14, lw: 3 });
-    if (stars) drawStars(x, y - r - 14, stars, 20);
-    if (cur) drawFlag(x, y - r + 2, 0.95);
-    hit(x - r - 6, y - r - 6, (r + 6) * 2, (r + 34), () => {
+    const lab = wn + '-' + s, lw2 = cur ? 68 : 58, lh2 = 24, ly = y + r + 5;
+    ctx.save();
+    rr(x - lw2 / 2, ly, lw2, lh2, 8);
+    const lg = ctx.createLinearGradient(0, ly, 0, ly + lh2);
+    lg.addColorStop(0, open ? '#9e2025' : '#50433e'); lg.addColorStop(1, open ? '#4e1115' : '#28211f');
+    ctx.fillStyle = lg; ctx.fill(); ctx.lineWidth = 2.2; ctx.strokeStyle = open ? '#f0bf55' : '#817367'; ctx.stroke();
+    ctx.restore();
+    text(lab, x, ly + lh2 / 2 + .5, { size: 14, lw: 3 });
+
+    if (stars) drawStars(x, y - r - 18, stars, 20);
+    if (cur) drawFlag(x - r * .2, y - r + 4, 1.0);
+
+    hit(x - baseR - 8, y - baseR - 8, (baseR + 8) * 2, baseR * 2 + 42, () => {
       if (!open) { toast('이전 스테이지를 먼저 클리어하세요'); return; }
       this.prep = { world: wn, s, stage: stageOf(wn, s) }; PrepUI.reset(this.prep);
     });
