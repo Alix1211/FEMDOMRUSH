@@ -647,19 +647,6 @@ function drawModal() {
   }
 }
 
-/* ═══════════════ 전투 화면 (준비 중) ═══════════════ */
-const BattleScreen = {
-  enter(a) { this.a = a; },
-  update() { },
-  draw() {
-    cover(img('assets/battle/battle_' + this.a.stage.map + '.webp'));
-    ctx.fillStyle = 'rgba(8,6,10,.55)'; ctx.fillRect(0, 0, GW, GH);
-    text('전투 화면은 준비 중입니다', GW / 2, 320, { size: 40, color: COL.gold, font: SERIF });
-    text('스테이지 ' + this.a.stage.id + ' · 덱 ' + this.a.deck.length + '명 선택됨', GW / 2, 376, { size: 20, weight: 600 });
-    button(GW / 2 - 110, 430, 220, 60, '돌아가기', () => go(Stage, { world: this.a.stage.world }), { size: 24, kind: 'primary' });
-  },
-};
-
 /* ═══════════════ 메인 루프 ═══════════════ */
 setScreen(Loading);
 let lastT = performance.now();

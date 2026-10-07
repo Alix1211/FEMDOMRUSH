@@ -105,6 +105,7 @@ class Battle {
   }
   hit(e, dmg, magic) {
     e.hp -= dmg; e.flash = 0.12;
+    this.fx.push({ t: 0, dur: 0.7, type: 'dmg', x: e.x + (Math.random() - 0.5) * 24, y: e.y - e.size * 0.85, v: Math.round(dmg), m: !!magic });
     if (e.hp <= 0 && !e.dead) this.killEnemy(e);
   }
   killEnemy(e) {
@@ -198,6 +199,7 @@ class Battle {
   hurtUnit(u, atk) {
     const dmg = calcDmg(atk, u.def) * (u.guard > 0 ? 0.4 : 1);
     u.hp -= dmg; u.flash = 0.12;
+    this.fx.push({ t: 0, dur: 0.7, type: 'dmgu', x: u.x + (Math.random() - 0.5) * 20, y: u.y - 96, v: Math.round(dmg) });
     if (u.hp <= 0) this.removeUnit(u, true);
   }
   leak(e) {
