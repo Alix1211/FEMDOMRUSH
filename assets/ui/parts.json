@@ -1,0 +1,98 @@
+{
+ "logo": [
+  648,
+  364
+ ],
+ "banner_top": [
+  562,
+  235
+ ],
+ "btn_fullscreen": [
+  93,
+  105
+ ],
+ "btn_speed": [
+  100,
+  104
+ ],
+ "btn_pause": [
+  97,
+  102
+ ],
+ "wave_bar": [
+  534,
+  123
+ ],
+ "heart_panel": [
+  243,
+  100
+ ],
+ "info_panel": [
+  473,
+  497
+ ],
+ "gem_panel": [
+  353,
+  141
+ ],
+ "skill_1": [
+  110,
+  108
+ ],
+ "skill_2": [
+  110,
+  108
+ ],
+ "skill_3": [
+  110,
+  108
+ ],
+ "card_archer": [
+  185,
+  239
+ ],
+ "card_shield": [
+  180,
+  239
+ ],
+ "card_sword": [
+  179,
+  239
+ ],
+ "card_mage": [
+  182,
+  239
+ ],
+ "card_locked": [
+  191,
+  223
+ ],
+ "deploy_spot": [
+  330,
+  165
+ ],
+ "badge_star": [
+  191,
+  156
+ ],
+ "badge_warn": [
+  175,
+  124
+ ],
+ "arrow_up": [
+  89,
+  91
+ ],
+ "arrow_down": [
+  90,
+  91
+ ],
+ "banner_bottom": [
+  736,
+  173
+ ],
+ "chest": [
+  241,
+  157
+ ]
+}
