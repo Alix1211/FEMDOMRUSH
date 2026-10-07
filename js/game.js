@@ -574,6 +574,7 @@ function drawPrep(p) {
     const row = i < 12 ? 0 : 1, col = i < 12 ? i : i - 12;
     const cw = roster.w * .044, x = roster.x + roster.w * (.02 + col * .082), y = roster.y + roster.h * (.12 + row * .46), inDeck = p.deck.includes(r.key);
     const h = drawCard(x, y, cw, r, { cost: CLASSES[r.cls].cost, dim: inDeck ? .55 : 0, lift: false });
+    if (hovered(x, y, cw, h)) hoveredUnit = { unit: r, x, y, w: cw };
     hit(x, y, cw, h, () => {
       if (inDeck) p.deck.splice(p.deck.indexOf(r.key), 1);
       else if (p.deck.length < 6) p.deck.push(r.key);
